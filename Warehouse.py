@@ -1,8 +1,10 @@
 import logging
+import csv
+import sys
 from enum import IntEnum
 logging.basicConfig(level = logging.DEBUG)
 
-Choice_List = IntEnum('Choice_List', 'exit show add sell sold cost income')
+Choice_List = IntEnum('Choice_List', 'exit show add sell sold cost income revenue save load')
 
 items = [
     {'name':'Potatoes','quantity': 200, 'unit':'kg', 'unit_price': 1.50},
@@ -26,7 +28,7 @@ def insert_new_product():
         name = input("What is the name of a new product?: ")
         try:
             name = int(name)
-            logging.info(f"Insert value isn't a word")
+            logging.info(f"Inserted value isn't a word")
         except ValueError:
             name = name.capitalize()
             k -= k
@@ -35,15 +37,18 @@ def insert_new_product():
         quantity = input("How much of new product is added?: ")
         try:
             quantity = int(quantity)
-            k -= k
+            if quantity > 0:
+                k -= k
+            else:
+                logging.info(f"Inserted value must be positive")
         except ValueError:
-            logging.info(f"Insert value isn't a number")
+            logging.info(f"Inserted value isn't a number")
     k = 1
     while k > 0:
         unit_name = input("What is the unit of new product?: ")
         try:
             unit_name = int(unit_name)
-            logging.info(f"Insert value isn't a word")
+            logging.info(f"Inserted value isn't a word")
         except ValueError:
             unit_name = unit_name.lower()
             k -= k
@@ -52,9 +57,12 @@ def insert_new_product():
         unit_price = input("What is the price for one unit of product in PLN?:")
         try:
             unit_price = float(unit_price)
-            k -= k
+            if unit_price > 0:
+                k -= k
+            else:
+                logging.info(f"Inserted value must be positive")
         except ValueError:
-            logging.info(f"Insert value isn't a number")
+            logging.info(f"Inserted value isn't a number")
     return(name, quantity, unit_name, unit_price)
     
 def add_item(name, unit_name, quantity, unit_price):
@@ -75,7 +83,35 @@ def sell_item(name, quantity):
 
 def get_value(list_name):
     total_value= [position['quantity']*position['unit_price']for position in list_name]
-    return sum(total_value)
+    return round(sum(total_value),2)
+
+def get_revenue():
+    earnings = get_value(sold_items) - get_value(items),
+    return earnings
+
+def export_items_to_csv():
+    with open('magazyn.csv','w',newline='') as csvfile:
+        fieldnames = ["Name","Quantity","Unit","Unit Price (PLN)"]
+        thewriter = csv.DictWriter(csvfile, fieldnames = fieldnames)
+        thewriter.writeheader()
+        for position in items:
+            thewriter.writerow({"Name":position['name'],"Quantity":position['quantity'],"Unit":position['unit'],"Unit Price (PLN)":position['unit_price']})
+
+def export_sales_items_to_csv():
+    with open('sales.csv','w',newline='') as csvfile:
+        fieldnames = ["Name","Quantity","Unit","Unit Price (PLN)"]
+        thewriter = csv.DictWriter(csvfile, fieldnames = fieldnames)
+        thewriter.writeheader()
+        for position in sold_items:
+            thewriter.writerow({"Name":position['name'],"Quantity":position['quantity'],"Unit":position['unit'],"Unit Price (PLN)":position['unit_price']})
+
+def load_items_form_csv(file_name):
+    items.clear()
+    with open(file_name,newline ='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            items.append({'name':row["Name"],'quantity':int(row["Quantity"]), 'unit':row["Unit"], 'unit_price':float(row["Unit Price (PLN)"])})
+    return items
 
 def check_name():
     j = 1
@@ -103,6 +139,16 @@ def check_quantity(name):
                     j -= j
     return quantity
 
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        logging.info(f"Too many files, only one required")
+        exit(1)
+    elif len(sys.argv) == 1:
+        pass
+    else:
+        logging.debug(f"Entered file:{sys.argv[1]}")
+        load_items_form_csv(sys.argv[1])
+
 i = 1 
 while i > 0:
     choice = (input('''What would you like to do ?
@@ -113,12 +159,15 @@ while i > 0:
 5 - Show sold products
 6 - Show value of owned products
 7 - Show income
+8 - Show revenue
+9 - Save data
+10 - Load data
 '''))
 
     if (choice.isdigit() == False):
         logging.info(f'Wrong value is given')
     else:
-        if int(choice) > 8:
+        if int(choice) > 10:
             logging.info(f'Wrong value is given')
         else:
             choice = int(choice)
@@ -137,7 +186,7 @@ while i > 0:
             name = product[0]
             quantity = product[1]
             unit_name = product[2]
-            unit_price = product[3]
+            unit_price = round(product[3],2)
             items.append(add_item(name, unit_name, quantity, unit_price))
 
     if choice == Choice_List.sell:
@@ -155,3 +204,14 @@ while i > 0:
         
     if choice == Choice_List.income:
         logging.info(f"Total income from sold products is: {get_value(sold_items)}")
+
+    if choice == Choice_List.revenue:
+        logging.info(f"Total revenue is: {get_revenue()}")
+    
+    if choice == Choice_List.save:
+        export_items_to_csv()
+        export_sales_items_to_csv()
+
+    if choice == Choice_List.load:
+        file_name = input("Please enter file name: ")
+        load_items_form_csv(file_name)
