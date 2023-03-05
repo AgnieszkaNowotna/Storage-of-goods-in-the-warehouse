@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class = "header text-center my-5">
+    <h2>Avaliable products</h2>
+</div>
+<div class = "mt-20">
+    <table class = "table">
+        <thead class = "thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Unit</th>
+            </tr>
+          </thead>
+        <tbody>
+            {% for product in product_list %}
+            <tr>
+                <th scope = "row"> </th>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.unit }}</td>
+                <td>{{ product.unit_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
