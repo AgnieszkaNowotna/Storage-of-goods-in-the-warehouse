@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <title>Stroage</title>
+    <title>Storage</title>
     <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/dashboard/">
 
     <!-- Bootstrap core CSS -->
@@ -54,6 +54,18 @@
         </div>
       </nav>
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success mt-3" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %} 
         {% block content %}
         {% endblock content %}
       </main>
