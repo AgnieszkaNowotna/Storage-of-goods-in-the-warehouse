@@ -15,21 +15,23 @@
             </tr>
           </thead>
         <tbody>
-            {% for product in product_list %}
+            {% for item in product_list.items() %}
             <tr>
-                <td class = "col-2">{{ product.name }}</td>
-                <td class = "col-2">{{ product.quantity }}</td>
-                <td class = "col-2">{{ product.unit }}</td>
-                <td class = "col-2">{{ product.unit_price }}</td>
-            </tr>
+                <td class = "col-2">{{ item[1].name }}</td>
+                <td class = "col-2">{{ item[1].quantity }}</td>
+                <td class = "col-2">{{ item[1].unit }}</td>
+                <td class = "col-2">{{ item[1].unit_price }}</td>
+                <td><a class = "btn btn-dark" href="{{ url_for('sell_product', product=item[0])}}">Sell product</a></td>
             {% endfor %}
+            </tr>
             <form id = "add_product" action = "{{ url_for('add_product')}}" method="POST">
                 <tr>
+                    {{ form.csrf_token }}
                     <td>{{ form.name }}</td>
                     <td>{{ form.quantity }}</td>
                     <td>{{ form.unit }}</td>
                     <td>{{ form.unit_price }}</td>
-                    <td><button class ="btn btn-dark" type="submit">Add product</button></td>
+                    <td><button class ="btn btn-outline-secondary" type="submit">Add product</button></td>
                 </tr>
         </tbody>
     </table>
